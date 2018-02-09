@@ -12,6 +12,7 @@
             </Col>
             <Col span="16" class="height-100">
                 <Row type="flex" align="middle" justify="center" class="height-100">
+                    <Badge :count="newNum">
                     <count-up 
                         class="infor-card-count user-created-count" 
                         :id-name="idName" 
@@ -22,6 +23,7 @@
                     >
                         <p class="infor-intro-text" slot="intro">{{ introText }}</p>
                     </count-up>
+                    </Badge>
                 </Row>
             </Col>
         </div>
@@ -38,6 +40,7 @@ export default {
     },
     props: {
         idName: String,
+        newNum: Number,
         endVal: Number,
         color: String,
         iconType: String,

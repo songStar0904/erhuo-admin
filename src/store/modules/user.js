@@ -5,7 +5,6 @@ const user = {
     mutations: {
         logout (state, vm) {
             Cookies.remove('user');
-            Cookies.remove('password');
             Cookies.remove('access');
             // 恢复默认样式
             let themeLink = document.querySelector('link[name="theme"]');
@@ -19,6 +18,9 @@ const user = {
             if (theme) {
                 localStorage.theme = theme;
             }
+        },
+        setUser (state, data){
+            state.info = data;
         }
     }
 };

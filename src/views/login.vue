@@ -12,15 +12,15 @@
                 </p>
                 <div class="form-con">
                     <Form ref="loginForm" :model="form" :rules="rules">
-                        <FormItem prop="userName">
-                            <Input v-model="form.userName" placeholder="请输入用户名">
+                        <FormItem prop="user_name">
+                            <Input v-model="form.user_name" placeholder="请输入用户名">
                                 <span slot="prepend">
                                     <Icon :size="16" type="person"></Icon>
                                 </span>
                             </Input>
                         </FormItem>
-                        <FormItem prop="password">
-                            <Input type="password" v-model="form.password" placeholder="请输入密码">
+                        <FormItem prop="user_psd">
+                            <Input type="password" v-model="form.user_psd" placeholder="请输入密码">
                                 <span slot="prepend">
                                     <Icon :size="14" type="locked"></Icon>
                                 </span>
@@ -30,7 +30,7 @@
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-                    <p class="login-tip">输入任意用户名和密码即可</p>
+                    <p class="login-tip">用户名是手机号码或者邮箱</p>
                 </div>
             </Card>
         </div>
@@ -39,18 +39,20 @@
 
 <script>
 import Cookies from 'js-cookie';
+import md5 from 'js-md5';
 export default {
     data () {
         return {
             form: {
-                userName: 'iview_admin',
-                password: ''
+                user_name: '15574406229',
+                user_psd: ''
             },
+            data: {},
             rules: {
-                userName: [
+                user_name: [
                     { required: true, message: '账号不能为空', trigger: 'blur' }
                 ],
-                password: [
+                user_psd: [
                     { required: true, message: '密码不能为空', trigger: 'blur' }
                 ]
             }
@@ -60,16 +62,27 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'iview_admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
+                    this.data = Object.assign({}, this.form);
+                    this.data.user_psd = md5(this.data.user_psd);
+                    this.$fetch.user.login(this.data)
+                    .then(res => {
+                        if (res.code === 200) {
+                            let access = res.data.user_access;
+                            if (access > 0) {
+                                Cookies.set('user', res.data.user_name);
+                                // Cookies.set('user_psd', this.data.user_psd);
+                                this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                                this.$store.commit('setUser', res.data);
+                                Cookies.set('access', access);
+                                this.$router.push({
+                                    name: 'home_index'
+                                });
+                            } else {
+                                this.$Message.warning('抱歉，您的权限不够!');
+                            }
+                        } else {
+                            this.$Message.error(res.msg);
+                        }
                     });
                 }
             });

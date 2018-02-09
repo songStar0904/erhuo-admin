@@ -27,7 +27,7 @@
                             <div class="line-gray"></div>
                             <Row class="margin-top-8">
                                 <Col span="8"><p class="notwrap">上次登录时间:</p></Col>
-                                <Col span="16" class="padding-left-8">2017.09.12-13:32:20</Col>
+                                <Col span="16" class="padding-left-8">{{last_time}}</Col>
                             </Row>
                             <Row class="margin-top-8">
                                 <Col span="8"><p class="notwrap">上次登录地点:</p></Col>
@@ -71,38 +71,42 @@
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="user_created_count"
-                            :end-val="count.createUser"
+                            :end-val="count.main_unum"
+                            :new-num="count.new.main_unum"
                             iconType="android-person-add"
                             color="#2d8cf0"
-                            intro-text="今日新增用户"
+                            intro-text="用户总数"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="visit_count"
-                            :end-val="count.visit"
-                            iconType="ios-eye"
+                            :end-val="count.main_gnum"
+                            :new-num="count.new.main_gnum"
+                            iconType="android-playstore"
                             color="#64d572"
                             :iconSize="50"
-                            intro-text="今日浏览量"
+                            intro-text="商品总数"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="collection_count"
-                            :end-val="count.collection"
-                            iconType="upload"
+                            :end-val="count.main_egnum"
+                            :new-num="count.new.main_egnum"
+                            iconType="ios-help"
                             color="#ffd572"
-                            intro-text="今日数据采集量"
+                            intro-text="待审核商品"
                         ></infor-card>
                     </Col>
                     <Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
                         <infor-card
                             id-name="transfer_count"
-                            :end-val="count.transfer"
-                            iconType="shuffle"
+                            :end-val="count.main_fnum"
+                            :new-num="count.new.main_fnum"
+                            iconType="chatbox-working"
                             color="#f25e43"
-                            intro-text="今日服务调用量"
+                            intro-text="留言总数"
                         ></infor-card>
                     </Col>
                 </Row>
@@ -186,7 +190,7 @@ import countUp from './components/countUp.vue';
 import inforCard from './components/inforCard.vue';
 import mapDataTable from './components/mapDataTable.vue';
 import toDoListItem from './components/toDoListItem.vue';
-
+import util from '@/libs/util';
 export default {
     name: 'home',
     components: {
@@ -219,12 +223,7 @@ export default {
                     title: '去iView官网学习完整的iView组件'
                 }
             ],
-            count: {
-                createUser: 496,
-                visit: 3264,
-                collection: 24389305,
-                transfer: 39503498
-            },
+            count: {},
             cityData: cityData,
             showAddNewTodo: false,
             newToDoItemValue: ''
@@ -233,7 +232,13 @@ export default {
     computed: {
         avatorPath () {
             return localStorage.avatorImgPath;
+        },
+        last_time () {
+            return util.timestampToTime(this.$store.state.user.info.user_ltime);
         }
+    },
+    created () {
+        this.getMain();
     },
     methods: {
         addNewToDoItem () {
@@ -255,6 +260,14 @@ export default {
         cancelAdd () {
             this.showAddNewTodo = false;
             this.newToDoItemValue = '';
+        },
+        getMain () {
+            this.$fetch.main.get().then(res=>{
+                if (res.code === 200) {
+                    this.count = Object.assign({}, res.data);
+                    console.log(this.count);
+                }
+            });
         }
     }
 };
