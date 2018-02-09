@@ -17,6 +17,7 @@
                 </div>
             </shrinkable-menu>
         </div>
+        <!-- 左菜单栏 -->
         <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'200px'}">
             <div class="main-header">
                 <div class="navicon-con">
@@ -24,11 +25,13 @@
                         <Icon type="navicon" size="32"></Icon>
                     </Button>
                 </div>
+                <!-- 缩放按钮 -->
                 <div class="header-middle-con">
                     <div class="main-breadcrumb">
                         <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
                     </div>
                 </div>
+                <!-- 当前位置面包屑 -->
                 <div class="header-avator-con">
                     <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
                     <lock-screen></lock-screen>
@@ -128,10 +131,8 @@
                     this.$store.commit('addOpenSubmenu', pathArr[1].name);
                 }
                 this.userName = Cookies.get('user');
-                let messageCount = 3;
-                this.messageCount = messageCount.toString();
                 this.checkTag(this.$route.name);
-                this.$store.commit('setMessageCount', 3);
+                this.get_fmsg();
             },
             toggleClick () {
                 this.shrink = !this.shrink;
@@ -144,11 +145,20 @@
                     });
                 } else if (name === 'loginout') {
                     // 退出登录
-                    this.$store.commit('logout', this);
-                    this.$store.commit('clearOpenedSubmenu');
-                    this.$router.push({
-                        name: 'login'
-                    });
+                    this.$fetch.user.loginOut()
+                    .then(res => {
+                        if (res.code === 200) {
+                            this.$store.commit('logout', this);
+                            this.$store.commit('clearOpenedSubmenu');
+                            this.$router.push({
+                                name: 'login'
+                            });
+                            this.$Message.info(res.msg);
+                        } else {
+                            this.$Message.error(res.msg);
+                        }
+                    })
+                    
                 }
             },
             checkTag (name) {
@@ -160,6 +170,16 @@
                 if (!openpageHasTag) { //  解决关闭当前标签后再点击回退按钮会退到当前页时没有标签的问题
                     util.openNewPage(this, name, this.$route.params || {}, this.$route.query || {});
                 }
+            },
+            get_fmsg () {
+                this.$fetch.main.get_fmsg({'fmsg_status': 0})
+                .then(res => {
+                    if (res.code === 200) {
+                        this.$store.commit('setMessageCount', res.data.length);
+                    } else {
+                        this.$Message.error(res.msg);
+                    }
+                })
             },
             handleSubmenuChange (val) {
                 // console.log(val)

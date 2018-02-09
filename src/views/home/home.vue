@@ -72,7 +72,6 @@
                         <infor-card
                             id-name="user_created_count"
                             :end-val="count.main_unum"
-                            :new-num="count.new.main_unum"
                             iconType="android-person-add"
                             color="#2d8cf0"
                             intro-text="用户总数"
@@ -82,7 +81,6 @@
                         <infor-card
                             id-name="visit_count"
                             :end-val="count.main_gnum"
-                            :new-num="count.new.main_gnum"
                             iconType="android-playstore"
                             color="#64d572"
                             :iconSize="50"
@@ -93,7 +91,6 @@
                         <infor-card
                             id-name="collection_count"
                             :end-val="count.main_egnum"
-                            :new-num="count.new.main_egnum"
                             iconType="ios-help"
                             color="#ffd572"
                             intro-text="待审核商品"
@@ -103,7 +100,6 @@
                         <infor-card
                             id-name="transfer_count"
                             :end-val="count.main_fnum"
-                            :new-num="count.new.main_fnum"
                             iconType="chatbox-working"
                             color="#f25e43"
                             intro-text="留言总数"
@@ -224,6 +220,7 @@ export default {
                 }
             ],
             count: {},
+            new_count: {},
             cityData: cityData,
             showAddNewTodo: false,
             newToDoItemValue: ''
@@ -234,7 +231,7 @@ export default {
             return localStorage.avatorImgPath;
         },
         last_time () {
-            return util.timestampToTime(this.$store.state.user.info.user_ltime);
+            return util.formatDate(this.$store.state.user.info.user_ltime);
         }
     },
     created () {
@@ -265,7 +262,7 @@ export default {
             this.$fetch.main.get().then(res=>{
                 if (res.code === 200) {
                     this.count = Object.assign({}, res.data);
-                    console.log(this.count);
+                    //this.new_count = res.data.new;
                 }
             });
         }

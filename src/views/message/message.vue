@@ -6,13 +6,13 @@
     <div class="message-main-con">
         <div class="message-mainlist-con">
             <div>
-                <Button @click="setCurrentMesType('unread')" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="currentMessageType === 'unread'" type="checkmark"></Icon></transition><span class="mes-type-btn-text">未读消息</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="unreadCount"></Badge></Button>
+                <Button @click="setCurrentMesType(0)" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="fmsg_status === 0" type="checkmark"></Icon></transition><span class="mes-type-btn-text">未读消息</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="unreadCount"></Badge></Button>
             </div>
             <div>
-                <Button @click="setCurrentMesType('hasread')" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="currentMessageType === 'hasread'" type="checkmark"></Icon></transition><span class="mes-type-btn-text">已读消息</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="hasreadCount"></Badge></Button>
+                <Button @click="setCurrentMesType(2)" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="fmsg_status === 2" type="checkmark"></Icon></transition><span class="mes-type-btn-text">已读消息</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="hasreadCount"></Badge></Button>
             </div>
             <div>
-                <Button @click="setCurrentMesType('recyclebin')" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="currentMessageType === 'recyclebin'" type="checkmark"></Icon></transition><span class="mes-type-btn-text">回收站</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="recyclebinCount"></Badge></Button>
+                <Button @click="setCurrentMesType(3)" size="large" long type="text"><transition name="mes-current-type-btn"><Icon v-show="fmsg_status === 3" type="checkmark"></Icon></transition><span class="mes-type-btn-text">回收站</span><Badge class="message-count-badge-outer" class-name="message-count-badge" :count="recyclebinCount"></Badge></Button>
             </div>
         </div>
         <div class="message-content-con">
@@ -25,11 +25,11 @@
                 <div v-if="!showMesTitleList" class="message-view-content-con">
                     <div class="message-content-top-bar">
                         <span class="mes-back-btn-con"><Button type="text" @click="backMesTitleList"><Icon type="chevron-left"></Icon>&nbsp;&nbsp;返回</Button></span>
-                        <h3 class="mes-title">{{ mes.title }}</h3>
+                        <h3 class="mes-title">{{ mes.fmsg_content }}</h3>
                     </div>
-                    <p class="mes-time-con"><Icon type="android-time"></Icon>&nbsp;&nbsp;{{ mes.time }}</p>
+                    <p class="mes-time-con"><Icon type="android-time"></Icon>&nbsp;&nbsp;{{ mes.fmsg_time }}</p>
                     <div class="message-content-body">
-                        <p class="message-content">{{ mes.content }}</p>
+                        <p class="message-content">{{ mes.fmsg_content }}</p>
                     </div>
                 </div>
             </transition>
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import util from '@/libs/util';
 export default {
     name: 'message_index',
     data () {
@@ -48,8 +49,11 @@ export default {
                 },
                 on: {
                     click: () => {
-                        this.hasreadMesList.unshift(this.currentMesList.splice(params.index, 1)[0]);
-                        this.$store.commit('setMessageCount', this.unreadMesList.length);
+                        let data = {fmsg_id: params.row.fmsg_id, fmsg_status: 2};
+                        this.edit_fmsg(data, () => {
+                            this.hasreadMesList.unshift(this.currentMesList.splice(params.index, 1)[0]);
+                            this.$store.commit('setMessageCount', this.unreadMesList.length);
+                        }); 
                     }
                 }
             }, '标为已读');
@@ -62,7 +66,10 @@ export default {
                 },
                 on: {
                     click: () => {
-                        this.recyclebinList.unshift(this.hasreadMesList.splice(params.index, 1)[0]);
+                        let data = {fmsg_id: params.row.fmsg_id, fmsg_status: 3};
+                        this.edit_fmsg(data, () => {
+                            this.recyclebinList.unshift(this.hasreadMesList.splice(params.index, 1)[0]);
+                        });
                     }
                 }
             }, '删除');
@@ -74,7 +81,10 @@ export default {
                 },
                 on: {
                     click: () => {
-                        this.hasreadMesList.unshift(this.recyclebinList.splice(params.index, 1)[0]);
+                        let data = {fmsg_id: params.row.fmsg_id, fmsg_status: 2};
+                        this.edit_fmsg(data, () => {
+                            this.hasreadMesList.unshift(this.recyclebinList.splice(params.index, 1)[0]);
+                        });
                     }
                 }
             }, '还原');
@@ -84,16 +94,16 @@ export default {
             unreadMesList: [],
             hasreadMesList: [],
             recyclebinList: [],
-            currentMessageType: 'unread',
+            fmsg_status: 0,
             showMesTitleList: true,
             unreadCount: 0,
             hasreadCount: 0,
             recyclebinCount: 0,
             noDataText: '暂无未读消息',
             mes: {
-                title: '',
-                time: '',
-                content: ''
+                fmsg_content: '',
+                fmsg_time: '',
+                fmsg_content: ''
             },
             mesTitleColumns: [
                 // {
@@ -111,12 +121,12 @@ export default {
                             on: {
                                 click: () => {
                                     this.showMesTitleList = false;
-                                    this.mes.title = params.row.title;
-                                    this.mes.time = this.formatDate(params.row.time);
+                                    this.mes.fmsg_content = params.row.fmsg_content;
+                                    this.mes.fmsg_time = util.formatDate(params.row.fmsg_time);
                                     this.getContent(params.index);
                                 }
                             }
-                        }, params.row.title);
+                        }, params.row.fmsg_content);
                     }
                 },
                 {
@@ -140,7 +150,7 @@ export default {
                                     type: 'android-time',
                                     size: 12
                                 }
-                            }, this.formatDate(params.row.time))
+                            }, util.formatDate(params.row.fmsg_time))
                         ]);
                     }
                 },
@@ -150,11 +160,11 @@ export default {
                     align: 'center',
                     width: 100,
                     render: (h, params) => {
-                        if (this.currentMessageType === 'unread') {
+                        if (this.fmsg_status === 0) {
                             return h('div', [
                                 markAsreadBtn(h, params)
                             ]);
-                        } else if (this.currentMessageType === 'hasread') {
+                        } else if (this.fmsg_status === 2) {
                             return h('div', [
                                 deleteMesBtn(h, params)
                             ]);
@@ -169,28 +179,18 @@ export default {
         };
     },
     methods: {
-        formatDate (time) {
-            let date = new Date(time);
-            let year = date.getFullYear();
-            let month = date.getMonth() + 1;
-            let day = date.getDate();
-            let hour = date.getHours();
-            let minute = date.getMinutes();
-            let second = date.getSeconds();
-            return year + '/' + month + '/' + day + '  ' + hour + ':' + minute + ':' + second;
-        },
         backMesTitleList () {
             this.showMesTitleList = true;
         },
         setCurrentMesType (type) {
-            if (this.currentMessageType !== type) {
+            if (this.fmsg_status !== type) {
                 this.showMesTitleList = true;
             }
-            this.currentMessageType = type;
-            if (type === 'unread') {
+            this.fmsg_status = type;
+            if (type === 0) {
                 this.noDataText = '暂无未读消息';
                 this.currentMesList = this.unreadMesList;
-            } else if (type === 'hasread') {
+            } else if (type === 2) {
                 this.noDataText = '暂无已读消息';
                 this.currentMesList = this.hasreadMesList;
             } else {
@@ -198,49 +198,43 @@ export default {
                 this.currentMesList = this.recyclebinList;
             }
         },
-        getContent (index) {
-            // you can write ajax request here to get message content
-            let mesContent = '';
-            switch (this.currentMessageType + index) {
-                case 'unread0': mesContent = '这是您点击的《欢迎登录iView-admin后台管理系统，来了解他的用途吧》的相关内容。'; break;
-                case 'unread1': mesContent = '这是您点击的《使用iView-admin和iView-ui组件库快速搭建你的后台系统吧》的相关内容。'; break;
-                case 'unread2': mesContent = '这是您点击的《喜欢iView-admin的话，欢迎到github主页给个star吧》的相关内容。'; break;
-                case 'hasread0': mesContent = '这是您点击的《这是一条您已经读过的消息》的相关内容。'; break;
-                default: mesContent = '这是您点击的《这是一条被删除的消息》的相关内容。'; break;
-            }
-            this.mes.content = mesContent;
+        getContent () {},
+        get_fmsg () {
+            this.$fetch.main.get_fmsg()
+            .then(res => {
+                if (res.code === 200) {
+                    Array.from(res.data).forEach((item, index) => {
+                        if (item.fmsg_status === 0) {
+                            this.unreadMesList.push(item);
+                        } else if (item.fmsg_status === 2) {
+                            this.hasreadMesList.push(item);
+                        } else if (item.fmsg_status === 3) {
+                            this.recyclebinList.push(item);
+                        }
+                    })
+                this.currentMesList = this.unreadMesList;
+                this.unreadCount = this.unreadMesList.length;
+                this.hasreadCount = this.hasreadMesList.length;
+                this.recyclebinCount = this.recyclebinList.length;
+                } else {
+                    this.$Message.error(res.msg);
+                }
+            })
+        },
+        edit_fmsg (data, callback) {
+            console.log(data);
+            this.$fetch.main.edit_fmsg(data)
+            .then(res => {
+                if (res.code === 200) {
+                    callback();
+                } else {
+                    this.$Message.error(res.msg);
+                }
+            })
         }
     },
     mounted () {
-        this.currentMesList = this.unreadMesList = [
-            {
-                title: '欢迎登录iView-admin后台管理系统，来了解他的用途吧',
-                time: 1507390106000
-            },
-            {
-                title: '使用iView-admin和iView-ui组件库快速搭建你的后台系统吧',
-                time: 1507390106000
-            },
-            {
-                title: '喜欢iView-admin的话，欢迎到github主页给个star吧',
-                time: 1507390106000
-            }
-        ];
-        this.hasreadMesList = [
-            {
-                title: '这是一条您已经读过的消息',
-                time: 1507330106000
-            }
-        ];
-        this.recyclebinList = [
-            {
-                title: '这是一条被删除的消息',
-                time: 1506390106000
-            }
-        ];
-        this.unreadCount = this.unreadMesList.length;
-        this.hasreadCount = this.hasreadMesList.length;
-        this.recyclebinCount = this.recyclebinList.length;
+        this.get_fmsg();
     },
     watch: {
         unreadMesList (arr) {
