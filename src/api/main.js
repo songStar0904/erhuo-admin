@@ -15,10 +15,10 @@ export function get_fmsg (params) {
   })
 }
 // 修改反馈信息
-export function edit_fmsg (params) {
+export function edit_fmsg (data) {
   return fetch({
     url: 'admin/edit_fmsg',
     method: 'post',
-    params
+    data
   })
 }

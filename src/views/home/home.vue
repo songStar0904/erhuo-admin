@@ -18,8 +18,9 @@
                                 <Col span="16" style="padding-left:6px;">
                                     <Row class-name="made-child-con-middle" type="flex" align="middle">
                                         <div>
-                                            <b class="card-user-infor-name">Admin</b>
-                                            <p>super admin</p>
+                                            <b class="card-user-infor-name">{{this.$store.state.user.info.user_name}}</b>
+                                            <p v-if="this.$store.state.user.info.user_access === 1">super admin</p>
+                                            <p v-else>admin</p>
                                         </div>
                                     </Row>
                                 </Col>
@@ -219,8 +220,12 @@ export default {
                     title: '去iView官网学习完整的iView组件'
                 }
             ],
-            count: {},
-            new_count: {},
+            count: {
+                main_unum: 0,
+                main_fnum: 0,
+                main_egnum: 0,
+                main_gnum: 0
+            },
             cityData: cityData,
             showAddNewTodo: false,
             newToDoItemValue: ''
@@ -231,6 +236,9 @@ export default {
             return localStorage.avatorImgPath;
         },
         last_time () {
+            if (!this.$store.state.user.info) {
+                this.$store.commit('setUser', JSON.parse(localStorage.getItem('user_info')));
+            }
             return util.formatDate(this.$store.state.user.info.user_ltime);
         }
     },
@@ -261,7 +269,7 @@ export default {
         getMain () {
             this.$fetch.main.get().then(res=>{
                 if (res.code === 200) {
-                    this.count = Object.assign({}, res.data);
+                    this.count = res.data;
                     //this.new_count = res.data.new;
                 }
             });
