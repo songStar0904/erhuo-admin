@@ -98,6 +98,17 @@ export const appRouter = [
         ]
     },
     {
+        path: '/user',
+        icon: 'android-people',
+        name: 'user',
+        title: '用户',
+        component: Main,
+        children: [
+            { path: 'user-list', title: '用户列表', name: 'user_list', icon: 'android-people', component: () => import('@/views/tables/user-table.vue') },
+            { path: 'user-lis', title: '用户列表', name: 'use', icon: 'android-people', component: () => import('@/views/tables/searchable-table.vue') }
+        ]
+    },
+    {
         path: '/component',
         icon: 'social-buffer',
         name: 'component',

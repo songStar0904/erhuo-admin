@@ -43,7 +43,7 @@ export function checkPhone (params) {
 // get user
 export function get (params) {
   return fetch({
-    url: 'user',
+    url: 'user/get',
     method: 'get',
     params
   })

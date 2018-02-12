@@ -1,6 +1,7 @@
 import axios from 'axios';
 import semver from 'semver';
 import packjson from '../../package.json';
+import schoolData from './school.js';
 
 let util = {
 
@@ -255,13 +256,24 @@ util.checkUpdate = function (vm) {
 };
 
 util.formatDate = function(timestamp) {
-        let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        let D = date.getDate() + ' ';
-        let h = date.getHours() + ':';
-        let m = date.getMinutes() + ':';
-        let s = date.getSeconds();
-        return Y+M+D+h+m+s;
+    let date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+    let Y = date.getFullYear() + '-';
+    let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+    let D = date.getDate() + ' ';
+    let h = date.getHours() + ':';
+    let m = date.getMinutes() + ':';
+    let s = date.getSeconds();
+    return Y+M+D+h+m+s;
+}
+
+util.formatSchool = function (school_id) {
+    for (let val in schoolData) {
+        for (let i = 0; i < schoolData[val].length; i++) {
+            if (school_id === Number(schoolData[val][i].id)) {
+                return schoolData[val][i].name;
+            }
+        }
     }
+    return '未知';
+}
 export default util;

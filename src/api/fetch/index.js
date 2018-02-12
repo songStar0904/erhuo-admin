@@ -9,7 +9,7 @@
 // 导入模块
 import axios from 'axios'
 import env from '../../../build/env';
-import router from '@/router';
+import {router} from '@/router';
 import md5 from 'js-md5';
 import qs from 'qs';
 import {Message} from 'iview';
@@ -65,7 +65,7 @@ export default function fetch (options) {
           resolve(response.data)
           return false
         } else {
-          router.replace({name: 'login'})
+          router.push('login')
         }
         Message.warning('失败')
         reject(response)
@@ -74,9 +74,10 @@ export default function fetch (options) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
+      // console.log(error.response.data);
+      // console.log(error.response.status);
+      // console.log(error.response.headers);
+      router.replace({name: `error-${error.response.status}`})
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -84,7 +85,7 @@ export default function fetch (options) {
       console.log(error.request);
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.log('Error', error.message);
+      Message.error('Error', error.message);
     }
     console.log(error.config);
   });
