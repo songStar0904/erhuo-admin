@@ -32,6 +32,14 @@ export function register (data) {
     data
   })
 }
+// 修改密码
+export function change_psd (data) {
+  return fetch({
+    url: 'user/change_psd',
+    method: 'post',
+    data
+  })
+}
 // checkPhone
 export function checkPhone (params) {
   return fetch({

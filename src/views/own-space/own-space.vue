@@ -19,12 +19,12 @@
                 >
                     <FormItem label="用户姓名：" prop="name">
                         <div style="display:inline-block;width:300px;">
-                            <Input v-model="userForm.name" ></Input>
+                            <Input v-model="userForm.user_name" ></Input>
                         </div>
                     </FormItem>
                     <FormItem label="用户手机：" prop="cellphone" >
                         <div style="display:inline-block;width:204px;">
-                            <Input v-model="userForm.cellphone" @on-keydown="hasChangePhone"></Input>
+                            <Input v-model="userForm.user_phone" @on-keydown="hasChangePhone"></Input>
                         </div>
                         <div style="display:inline-block;position:relative;">
                             <Button @click="getIdentifyCode" :disabled="canGetIdentifyCode">{{ gettingIdentifyCodeBtnContent }}</Button>
@@ -39,11 +39,17 @@
                             </div>
                         </div>
                     </FormItem>
-                    <FormItem label="公司：">
-                        <span>{{ userForm.company }}</span>
+                    <FormItem label="邮箱：">
+                        <span>{{ userForm.user_email }}</span>
                     </FormItem>
-                    <FormItem label="部门：">
-                        <span>{{ userForm.department }}</span>
+                    <FormItem label="性别：">
+                        <span>{{ userForm.user_sex | formatSex }}</span>
+                    </FormItem>
+                    <FormItem label="学校：">
+                        <span>{{userForm.user_sid | formatSchool }}</span>
+                    </FormItem>
+                    <FormItem label="上次登录时间：">
+                        <span>{{userForm.user_ltime | formatDate }}</span>
                     </FormItem>
                     <FormItem label="登录密码：">
                         <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
@@ -77,6 +83,8 @@
 </template>
 
 <script>
+import util from '@/libs/util.js';
+import md5 from 'js-md5';
 export default {
     name: 'ownspace_index',
     data () {
@@ -147,6 +155,21 @@ export default {
             gettingIdentifyCodeBtnContent: '获取验证码' // “获取验证码”按钮的文字
         };
     },
+    filters: {
+        formatSex (val) {
+            if (val === 'male') {
+                return '男';
+            } else {
+                return '女';
+            }
+        },
+        formatSchool (val) {
+            return util.formatSchool(val);
+        },
+        formatDate (val) {
+            return util.formatDate(val);
+        }
+    },
     methods: {
         getIdentifyCode () {
             this.hasGetIdentifyCode = true;
@@ -211,16 +234,27 @@ export default {
             this.$refs['editPasswordForm'].validate((valid) => {
                 if (valid) {
                     this.savePassLoading = true;
-                    // you can write ajax request here
+                    let data = {
+                        user_name: this.userForm.user_phone ? this.userForm.user_phone : this.userForm.user_email,
+                        user_psd: md5(this.editPasswordForm.newPass),
+                        user_old_psd: md5(this.editPasswordForm.oldPass)
+                    };
+                    this.$fetch.user.change_psd(data)
+                    .then(res => {
+                        if (res.code === 200) {
+                            this.savePassLoading = false;
+                            this.editPasswordModal = false;
+                            this.$Message.success(res.msg);
+                        } else {
+                            this.savePassLoading = false;
+                            this.$Message.error(res.msg);
+                        }
+                    })
                 }
             });
         },
         init () {
-            this.userForm.name = 'Lison';
-            this.userForm.cellphone = '17712345678';
-            this.initPhone = '17712345678';
-            this.userForm.company = 'TalkingData';
-            this.userForm.department = '可视化部门';
+            this.userForm = this.$store.state.user.info;
         },
         cancelInputCodeBox () {
             this.inputCodeVisible = false;

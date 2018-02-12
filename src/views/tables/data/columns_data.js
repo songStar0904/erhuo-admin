@@ -6,17 +6,37 @@ export const userColumns = [
         type: 'index',
         key: 'user_id',
         width: 80,
-        align: 'center'
+        align: 'center',
+        sortable: true
     },
     {
         title: '昵称',
         align: 'center',
         key: 'user_name',
-        editable: true
+        editable: true,
+        sortable: true
     },
     {
         title: '性别',
         align: 'center',
+        filters: [
+            {
+                label: '男',
+                value: 1
+            },
+            {
+                label: '女',
+                value: 2
+            }
+        ],
+        filterMultiple: false,
+        filterMethod (value, row) {
+            if (value === 1) {
+                return row.user_sex === 'male';
+            } else if (value === 2) {
+                return row.user_sex === 'female';
+            }
+        },
         render: (h, params) => {
             return h('div', params.row.user_sex === 'male' ? '男' : '女' );
         }
@@ -32,24 +52,26 @@ export const userColumns = [
         title: '手机',
         align: 'center',
         key: 'user_phone',
-        editable: true
+        editable: true,
+        sortable: true
     },
     {
         title: '邮箱',
         align: 'center',
         key: 'user_email',
         width: 180,
-        editable: true
+        editable: true,
+        sortable: true
     },
     {
         title: '注册时间',
         align: 'center',
-        editable: true,
+        sortable: true,
         render: (h, params) => {
             return h('div', [
                 h('Icon', {
                     props: {
-                        type: 'person'
+                        type: 'clock'
                     }
                 }),
                 h('span', util.formatDate(params.row.user_rtime))

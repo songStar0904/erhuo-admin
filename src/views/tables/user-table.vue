@@ -23,10 +23,16 @@
 				        </Col>
 				    </Row>
                     <Row style="margin: 40px 0;">
-                        <Table :loading="loading" :columns="userColumns" :data="data"></Table>
+                        <Table :loading="loading" :columns="userColumns" :data="data" ref="tableExcel"></Table>
                     </Row>
                     <Row span="24">
-				        <Col span="12">123</Col>
+				        <Col span="12">
+					        <Input v-model="tableName" placeholder="请输入文件名" style="width: 200px" />
+					        <div class="margin-left-10 margin-top-20">
+                            <a id="hrefToExportTable" style="postion: absolute;left: -10px;top: -10px;width: 0px;height: 0px;"></a>
+                            <Button type="primary" icon="ios-download-outline" @click="exportExcel">导出表格</Button>
+                        </div>
+					    </Col>
 				        <Col span="12">
 					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" :page-size-opts="[1, 2, 20, 50]" size="small" show-elevator show-sizer class-name="fr"></Page>
 					    </Col>
@@ -39,6 +45,7 @@
 </template>
 
 <script>
+import table2excel from '@/libs/table2excel.js';
 import {userColumns} from './data/columns_data.js';
 export default {
     data () {
@@ -50,6 +57,7 @@ export default {
             initTable: [],
             total: 0,
             searchData: '',
+            tableName: '',
             page: 1,
             num: 1
         };
@@ -87,6 +95,14 @@ export default {
         },
         handleCancel () {
             this.data = this.initTable;
+        },
+        exportExcel () {
+        	if (this.tableName) {
+        		console.log(this.$refs.tableExcel)
+        		table2excel.transform(this.$refs.tableExcel, 'hrefToExportTable', this.tableName);
+        	} else {
+        		this.$Message.warning('文件名不能为空');
+        	}
         }
     },
     mounted () {
