@@ -1,5 +1,4 @@
 import axios from 'axios';
-import env from '../../build/env';
 import semver from 'semver';
 import packjson from '../../package.json';
 
@@ -10,17 +9,6 @@ util.title = function (title) {
     title = title || 'iView admin';
     window.document.title = title;
 };
-
-const ajaxUrl = env === 'development'
-    ? 'http://api.erhuo.com'
-    : env === 'production'
-        ? 'http://api.erhuo.com'
-        : 'http://api.erhuo.com';
-
-util.ajax = axios.create({
-    baseURL: ajaxUrl,
-    timeout: 30000
-});
 
 util.inOf = function (arr, targetArr) {
     let res = true;

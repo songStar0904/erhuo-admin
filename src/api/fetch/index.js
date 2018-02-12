@@ -7,23 +7,35 @@
 */
 
 // 导入模块
-// import axios from 'axios'
+import axios from 'axios'
+import env from '../../../build/env';
 import router from '@/router';
-import util from '@/libs/util';
 import md5 from 'js-md5';
+import qs from 'qs';
+import {Message} from 'iview';
+const ajaxUrl = env === 'development'
+    ? 'http://api.erhuo.com'
+    : env === 'production'
+        ? 'http://api.erhuo.com'
+        : 'http://api.erhuo.com';
 
 export default function fetch (options) {
   return new Promise((resolve, reject) => {
     // 创建一个axios实例
-    const instance = util.ajax;
+    const instance = axios.create({
+        baseURL: ajaxUrl,
+        timeout: 10000,
+        headers: {"Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'}
+    });
     if (!options['params'] && !options['data']) {
       options['params'] = {};
     }
+
     let now = Date.parse( new Date() ).toString().substr(0, 10);
     let token = '';
     let params = options['params'] ? options['params'] : options['data'];
     for (let key in params) {
-      token += md5(params[key]);
+      token += md5(params[key].toString()); // md5接受参数为数字0 会出错
     }
     token = md5(`api_${token}_api`);
     if (options['data']) {
@@ -33,8 +45,18 @@ export default function fetch (options) {
       options['params']['time'] = now;
       options['params']['token'] = token;
     }
-   
-    // console.log(options);
+    // 添加请求拦截器
+    instance.interceptors.request.use((config) =>{
+      // 在发送请求之前做些什么
+      if (config.method === 'post') {
+          config.data = qs.stringify(config.data);
+      }
+      return config;
+    }, (error) => {
+      // 对请求错误做些什么
+      console.log(error);
+      return Promise.reject(error);
+    });
     // 请求处理
     instance(options)
       .then((response) => {
@@ -45,18 +67,26 @@ export default function fetch (options) {
         } else {
           router.replace({name: 'login'})
         }
-        this.$Message.warning('失败')
+        Message.warning('失败')
         reject(response)
       })
-      .catch((error) => {
-        // 请求失败时,根据业务判断状态
-        if (error.response) {
-          let resError = error.response
-          let resCode = resError.status
-          let resMsg = error.message
-          this.$Message.error('操作失败！错误原因 ' + resMsg)
-          reject({code: resCode, msg: resMsg})
-        }
-      })
+      .catch(function (error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+    console.log(error.config);
+  });
   })
 }

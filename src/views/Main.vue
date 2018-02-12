@@ -174,6 +174,7 @@
             get_fmsg () {
                 this.$fetch.main.get_fmsg({'fmsg_status': 0})
                 .then(res => {
+                    console.log(res);
                     if (res.code === 200) {
                         this.$store.commit('setMessageCount', res.data.length);
                     } else {

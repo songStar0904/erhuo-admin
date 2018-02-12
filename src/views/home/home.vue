@@ -18,8 +18,8 @@
                                 <Col span="16" style="padding-left:6px;">
                                     <Row class-name="made-child-con-middle" type="flex" align="middle">
                                         <div>
-                                            <b class="card-user-infor-name">{{this.$store.state.user.info.user_name}}</b>
-                                            <p v-if="this.$store.state.user.info.user_access === 1">super admin</p>
+                                            <b class="card-user-infor-name">{{user_info.user_name}}</b>
+                                            <p v-if="user_info.user_access === 1">super admin</p>
                                             <p v-else>admin</p>
                                         </div>
                                     </Row>
@@ -28,11 +28,11 @@
                             <div class="line-gray"></div>
                             <Row class="margin-top-8">
                                 <Col span="8"><p class="notwrap">上次登录时间:</p></Col>
-                                <Col span="16" class="padding-left-8">{{last_time}}</Col>
+                                <Col span="16" class="padding-left-8">{{formatDate(user_info.user_ltime)}}</Col>
                             </Row>
                             <Row class="margin-top-8">
                                 <Col span="8"><p class="notwrap">上次登录地点:</p></Col>
-                                <Col span="16" class="padding-left-8">北京</Col>
+                                <Col span="16" class="padding-left-8">{{user_info.user_ip}}</Col>
                             </Row>
                         </Card>
                     </Col>
@@ -73,6 +73,7 @@
                         <infor-card
                             id-name="user_created_count"
                             :end-val="count.main_unum"
+                            :new-num="new_count.main_unum"
                             iconType="android-person-add"
                             color="#2d8cf0"
                             intro-text="用户总数"
@@ -82,6 +83,7 @@
                         <infor-card
                             id-name="visit_count"
                             :end-val="count.main_gnum"
+                            :new-num="new_count.main_gnum"
                             iconType="android-playstore"
                             color="#64d572"
                             :iconSize="50"
@@ -92,6 +94,7 @@
                         <infor-card
                             id-name="collection_count"
                             :end-val="count.main_egnum"
+                            :new-num="new_count.main_egnum"
                             iconType="ios-help"
                             color="#ffd572"
                             intro-text="待审核商品"
@@ -101,6 +104,7 @@
                         <infor-card
                             id-name="transfer_count"
                             :end-val="count.main_fnum"
+                            :new-num="new_count.main_fnum"
                             iconType="chatbox-working"
                             color="#f25e43"
                             intro-text="留言总数"
@@ -226,6 +230,7 @@ export default {
                 main_egnum: 0,
                 main_gnum: 0
             },
+            new_count: {},
             cityData: cityData,
             showAddNewTodo: false,
             newToDoItemValue: ''
@@ -235,11 +240,11 @@ export default {
         avatorPath () {
             return localStorage.avatorImgPath;
         },
-        last_time () {
+        user_info () {
             if (!this.$store.state.user.info) {
                 this.$store.commit('setUser', JSON.parse(localStorage.getItem('user_info')));
             }
-            return util.formatDate(this.$store.state.user.info.user_ltime);
+            return this.$store.state.user.info;
         }
     },
     created () {
@@ -270,9 +275,12 @@ export default {
             this.$fetch.main.get().then(res=>{
                 if (res.code === 200) {
                     this.count = res.data;
-                    //this.new_count = res.data.new;
+                    this.new_count = res.data.new;
                 }
             });
+        },
+        formatDate (time) {
+            return util.formatDate(time);
         }
     }
 };

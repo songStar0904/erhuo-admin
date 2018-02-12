@@ -222,7 +222,6 @@ export default {
             })
         },
         edit_fmsg (data, callback) {
-            console.log(data);
             this.$fetch.main.edit_fmsg(data)
             .then(res => {
                 if (res.code === 200) {
