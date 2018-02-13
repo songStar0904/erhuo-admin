@@ -109,6 +109,17 @@ export const appRouter = [
         ]
     },
     {
+        path: '/goods',
+        icon: 'android-playstore',
+        name: 'goods',
+        title: '商品',
+        component: Main,
+        children: [
+            { path: 'goods-list', title: '商品列表', name: 'goods_list', icon: 'android-playstore', component: () => import('@/views/tables/user-table.vue') },
+            { path: 'goods-classify', title: '商品分类', name: 'goods_classify', icon: 'merge', component: () => import('@/views/tables/goods-classify.vue') }
+        ]
+    },
+    {
         path: '/component',
         icon: 'social-buffer',
         name: 'component',

@@ -114,9 +114,31 @@ export const userColumns = [
         }
     }
 ];
-
+export const gclassifyColumns = [
+    {
+        title: '序号',
+        type: 'index',
+        width: 80,
+        key: 'gclassify_id',
+        align: 'center'
+    },
+    {
+        title: '分类名称',
+        align: 'center',
+        key: 'gclassify_name',
+        editable: true
+    },
+    {
+        title: '操作',
+        align: 'center',
+        width: 200,
+        key: 'handle',
+        handle: ['edit', 'delete']
+    }
+];
 const tableData = {
-    userColumns: userColumns
+    userColumns: userColumns,
+    gclassifyColumns: gclassifyColumns
 };
 
 export default tableData;

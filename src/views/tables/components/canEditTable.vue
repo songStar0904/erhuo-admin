@@ -30,14 +30,27 @@ const editButton = (vm, h, currentRow, index) => {
                     vm.edittingStore[index].editting = true;
                     vm.thisTableData = JSON.parse(JSON.stringify(vm.edittingStore));
                 } else {
-                    vm.edittingStore[index].saving = true;
+                    // debugger
+                    // vm.edittingStore[index].saving = true;
                     vm.thisTableData = JSON.parse(JSON.stringify(vm.edittingStore));
                     let edittingRow = vm.edittingStore[index];
                     edittingRow.editting = false;
-                    edittingRow.saving = false;
+                    
                     vm.thisTableData = JSON.parse(JSON.stringify(vm.edittingStore));
-                    vm.$emit('input', vm.handleBackdata(vm.thisTableData));
-                    vm.$emit('on-change', vm.handleBackdata(vm.thisTableData), index);
+                    vm.$fetch.classify.edit({
+                        type: 'gclassify',
+                        id: edittingRow['gclassify_id'],
+                        name: edittingRow['gclassify_name']
+                    }).then(res => {
+                        edittingRow.saving = false;
+                        if (res.code === 200) {
+                            
+                            vm.$emit('input', vm.handleBackdata(vm.thisTableData));
+                            vm.$emit('on-change', vm.handleBackdata(vm.thisTableData), index);
+                        } else {
+                            vm.$Message.error(res.msg);
+                        }
+                    })
                 }
             }
         }
@@ -112,10 +125,23 @@ const saveIncellEditBtn = (vm, h, param) => {
         },
         on: {
             click: (event) => {
-                vm.edittingStore[param.index].edittingCell[param.column.key] = false;
                 vm.thisTableData = JSON.parse(JSON.stringify(vm.edittingStore));
-                vm.$emit('input', vm.handleBackdata(vm.thisTableData));
-                vm.$emit('on-cell-change', vm.handleBackdata(vm.thisTableData), param.index, param.column.key);
+                vm.edittingStore[param.index].edittingCell[param.column.key] = false;
+                let data = vm.thisTableData[param.index];
+                vm.$fetch.classify.edit({
+                    type: 'gclassify',
+                    id: data['gclassify_id'],
+                    name: data['gclassify_name']
+                }).then(res => {
+                    if (res.code === 200) {
+
+                        vm.$emit('input', vm.handleBackdata(vm.thisTableData));
+                        vm.$emit('on-cell-change', vm.handleBackdata(vm.thisTableData), param.index, param.column.key);
+                    } else {
+                        vm.$Message.error(res.msg);
+                    }
+                })
+                
             }
         }
     });

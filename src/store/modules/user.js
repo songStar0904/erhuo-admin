@@ -20,6 +20,7 @@ const user = {
             }
         },
         setUser (state, data){
+            localStorage.setItem('user_info', JSON.stringify(data));
             state.info = data;
         }
     }

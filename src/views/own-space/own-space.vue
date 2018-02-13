@@ -17,12 +17,12 @@
                     label-position="right"
                     :rules="inforValidate"
                 >
-                    <FormItem label="用户姓名：" prop="name">
+                    <FormItem label="用户昵称：" prop="user_name">
                         <div style="display:inline-block;width:300px;">
                             <Input v-model="userForm.user_name" ></Input>
                         </div>
                     </FormItem>
-                    <FormItem label="用户手机：" prop="cellphone" >
+                    <!-- <FormItem label="用户手机：" prop="cellphone" >
                         <div style="display:inline-block;width:204px;">
                             <Input v-model="userForm.user_phone" @on-keydown="hasChangePhone"></Input>
                         </div>
@@ -38,9 +38,26 @@
                                 </div>
                             </div>
                         </div>
+                    </FormItem> -->
+                    <FormItem label="手机：">
+                        <Row v-if="userForm.user_phone">
+                            <Col span="12">{{ userForm.user_phone | formatPhone }}</Col>
+                            <Col span="12"><Button type="text">修改</Button></Col>
+                        </Row>
+                        <Row v-else>
+                            <Col span="12">未绑定</Col>
+                            <Col span="12"><Button type="text">绑定</Button></Col>
+                        </Row>
                     </FormItem>
                     <FormItem label="邮箱：">
-                        <span>{{ userForm.user_email }}</span>
+                        <Row v-if="userForm.user_email">
+                            <Col span="12">{{ userForm.user_email }}</Col>
+                            <Col span="12"><Button type="text">修改</Button></Col>
+                        </Row>
+                        <Row v-else>
+                            <Col span="12">未绑定</Col>
+                            <Col span="12"><Button type="text">绑定</Button></Col>
+                        </Row>
                     </FormItem>
                     <FormItem label="性别：">
                         <span>{{ userForm.user_sex | formatSex }}</span>
@@ -53,6 +70,9 @@
                     </FormItem>
                     <FormItem label="登录密码：">
                         <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
+                    </FormItem>
+                    <FormItem label="个性签名">
+                        <Input v-model="userForm.user_sign" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请填写个性签名"></Input>
                     </FormItem>
                     <div>
                         <Button type="text" style="width: 100px;" @click="cancelEditUserInfor">取消</Button>
@@ -104,12 +124,7 @@ export default {
             }
         };
         return {
-            userForm: {
-                name: '',
-                cellphone: '',
-                company: '',
-                department: ''
-            },
+            userForm: {},
             uid: '', // 登录用户的userId
             securityCode: '', // 验证码
             phoneHasChanged: false, // 是否编辑了手机
@@ -123,7 +138,7 @@ export default {
             canGetIdentifyCode: false, // 是否可点获取验证码
             checkIdentifyCodeLoading: false,
             inforValidate: {
-                name: [
+                user_name: [
                     { required: true, message: '请输入姓名', trigger: 'blur' }
                 ],
                 cellphone: [
@@ -158,10 +173,13 @@ export default {
     filters: {
         formatSex (val) {
             if (val === 'male') {
-                return '男';
+                return '男生';
             } else {
-                return '女';
+                return '女生';
             }
+        },
+        formatPhone (val) {
+            return val.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
         },
         formatSchool (val) {
             return util.formatSchool(val);
@@ -242,6 +260,7 @@ export default {
                     this.$fetch.user.change_psd(data)
                     .then(res => {
                         if (res.code === 200) {
+                            this.$store.commit('setUser', res.data);
                             this.savePassLoading = false;
                             this.editPasswordModal = false;
                             this.$Message.success(res.msg);
@@ -280,10 +299,15 @@ export default {
         },
         saveInfoAjax () {
             this.save_loading = true;
-            setTimeout(() => {
-                this.$Message.success('保存成功');
+            this.$fetch.user.edit(this.userForm)
+            .then(res => {
                 this.save_loading = false;
-            }, 1000);
+                if (res.code === 200) {
+                    this.$Message.success('保存成功');
+                } else {
+                    this.$Message.error(res.msg); 
+                }
+            })
         }
     },
     mounted () {

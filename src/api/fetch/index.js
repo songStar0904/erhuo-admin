@@ -31,20 +31,19 @@ export default function fetch (options) {
       options['params'] = {};
     }
 
+
     let now = Date.parse( new Date() ).toString().substr(0, 10);
     let token = '';
-    let params = options['params'] ? options['params'] : options['data'];
+    let method = options['params'] ? 'params' : 'data'; 
+    let params = options[method];
     for (let key in params) {
-      token += md5(params[key].toString()); // md5接受参数为数字0 会出错
+      if (key !== 'time' && key !== 'token') {
+        token += md5(params[key] + ''); // md5接受参数为数字0 会出错
+      }
     }
     token = md5(`api_${token}_api`);
-    if (options['data']) {
-      options['data']['time'] = now;
-      options['data']['token'] = token;
-    } else {
-      options['params']['time'] = now;
-      options['params']['token'] = token;
-    }
+    options[method]['time'] = now;
+    options[method]['token'] = token;
     // 添加请求拦截器
     instance.interceptors.request.use((config) =>{
       // 在发送请求之前做些什么

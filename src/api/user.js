@@ -58,7 +58,7 @@ export function get (params) {
 }
 export function edit (data) {
   return fetch({
-    url: 'user/modify',
+    url: 'user/edit',
     method: 'post',
     data
   })
