@@ -12,9 +12,11 @@
                         <Icon type="ios-keypad"></Icon>
                          商品分类
                     </p>
+                    <p slot="extra">
+                        <Button type="info" icon="android-add-circle" @click="addClassifyModel = true">添加分类</Button>
+                    </p>
                     <Row :gutter="10">
                         <Col span="24">
-                            <div class="edittable-table-height-con">
                                 <can-edit-table 
                                     refs="table" 
                                     v-model="data" 
@@ -23,7 +25,6 @@
                                     :editIncell="true" 
                                     :columns-list="gclassifyColumns"
                                 ></can-edit-table>
-                            </div>
                         </Col>
                         <Modal :width="900" v-model="showCurrentTableData">
                             <can-edit-table refs="table5" v-model="data" :columns-list="showCurrentColumns"></can-edit-table>
@@ -32,6 +33,12 @@
                 </Card>
             </Col>
         </Row>
+        <Modal v-model="addClassifyModel" title="添加分类" width="360">
+            <Input v-model="name" placeholder="请输入分类名称"></Input>
+            <div slot="footer">
+                <Button type="info" size="large" long :loading="modal_loading" @click="addClassify">添加</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -53,7 +60,10 @@ export default {
             gclassifyColumns: gclassifyColumns,
             data: [],
             showCurrentColumns: [],
-            showCurrentTableData: false
+            showCurrentTableData: false,
+            addClassifyModel: false,
+            modal_loading: false,
+            name: ''
         };
     },
     methods: {
@@ -76,6 +86,22 @@ export default {
         },
         handleChange (val, index) {
         	this.$Message.success('修改了第' + (index + 1) + '行数据');
+        },
+        addClassify () {
+            this.modal_loading = true;
+            this.$fetch.classify.add({
+                type: 'gclassify',
+                name: this.name
+            }).then(res => {
+                this.modal_loading = false;
+                this.addClassifyModel = false;
+                if (res.code === 200) {
+                    this.name = '';
+                    this.getData();
+                } else {
+                    this.$Message.error(res.msg);
+                }
+            })
         }
     },
     created () {

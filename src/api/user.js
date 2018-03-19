@@ -40,6 +40,14 @@ export function change_psd (data) {
     data
   })
 }
+// upload
+export function upload (data) {
+  return fetch({
+    url: 'user/upload',
+    method: 'post',
+    data
+  })
+}
 // checkPhone
 export function checkPhone (params) {
   return fetch({
