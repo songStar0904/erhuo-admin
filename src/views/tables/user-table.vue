@@ -28,10 +28,10 @@
                     <Row span="24">
 				        <Col span="12">
 					        <Input v-model="tableName" placeholder="请输入文件名" style="width: 200px" />
-					        <div class="margin-left-10 margin-top-20">
-                            <a id="hrefToExportTable" style="postion: absolute;left: -10px;top: -10px;width: 0px;height: 0px;"></a>
-                            <Button type="primary" icon="ios-download-outline" @click="exportExcel">导出表格</Button>
-                        </div>
+					        <span class="margin-left-10 margin-top-20">
+                                <a id="hrefToExportTable" style="postion: absolute;left: -10px;top: -10px;width: 0px;height: 0px;"></a>
+                                <Button type="primary" icon="ios-download-outline" @click="exportExcel">导出表格</Button>
+                            </span>
 					    </Col>
 				        <Col span="12">
 					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" :page-size-opts="[1, 2, 20, 50]" size="small" show-elevator show-sizer class-name="fr"></Page>
@@ -51,7 +51,7 @@ export default {
     data () {
         return {
         	title: '用户列表',
-        	loading: true,
+        	loading: false,
             data: [],
             userColumns: userColumns,
             initTable: [],
@@ -59,7 +59,7 @@ export default {
             searchData: '',
             tableName: '',
             page: 1,
-            num: 1
+            num: 2
         };
     },
     methods: {
@@ -67,6 +67,7 @@ export default {
             this.getUser();
         },
         getUser () {
+            this.loading = true;
         	this.$fetch.user.get({
         		page: this.page,
         		num: this.num,

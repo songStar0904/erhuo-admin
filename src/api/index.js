@@ -7,12 +7,16 @@
 
 // 导入模块
 import * as user from './user.js'
+import * as goods from './goods.js'
+import * as notice from './notice.js'
 import * as main from './main.js'
 import * as classify from './classify.js'
 
 const apiObj = {
   main,
   user,
+  notice,
+  goods,
   classify
 }
 const install = function (Vue) {

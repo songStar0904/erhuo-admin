@@ -71,7 +71,7 @@ export default {
                             if (access > 0) {
                                 Cookies.set('user', res.data.user_name);
                                 // Cookies.set('user_psd', this.data.user_psd);
-                                this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                                this.$store.commit('setAvator', res.data.user_icon);
                                 Cookies.set('access', access);
                                 this.$store.commit('setUser', res.data);
                                 this.$router.push({

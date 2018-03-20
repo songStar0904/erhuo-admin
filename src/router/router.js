@@ -115,8 +115,19 @@ export const appRouter = [
         title: '商品',
         component: Main,
         children: [
-            { path: 'goods-list', title: '商品列表', name: 'goods_list', icon: 'android-playstore', component: () => import('@/views/tables/user-table.vue') },
+            { path: 'goods-list', title: '商品列表', name: 'goods_list', icon: 'android-playstore', component: () => import('@/views/tables/goods-table.vue') },
             { path: 'goods-classify', title: '商品分类', name: 'goods_classify', icon: 'merge', component: () => import('@/views/tables/goods-classify.vue') }
+        ]
+    },
+    {
+        path: '/notice',
+        icon: 'speakerphone',
+        name: 'notice',
+        title: '公告通知',
+        component: Main,
+        children: [
+            { path: 'add', title: '官方公告', name: 'add-notice', icon: 'android-people', component: () => import('@/views/notice/add-notice.vue') },
+            { path: 'user-lis', title: '用户列表', name: 'use', icon: 'android-people', component: () => import('@/views/tables/searchable-table.vue') }
         ]
     },
     {

@@ -265,7 +265,15 @@ util.formatDate = function(timestamp) {
     let s = date.getSeconds();
     return Y+M+D+h+m+s;
 }
-
+util.formatGoodsType = function(val) {
+    if (val === 0) {
+        return '送货上门/自提';
+    } else if (val === 1) {
+        return '送货上门';
+    } else {
+        return '自提';
+    }
+}
 util.formatSchool = function (school_id) {
     for (let val in schoolData) {
         for (let i = 0; i < schoolData[val].length; i++) {
