@@ -239,42 +239,12 @@ export const goodsColumns = [
     },
     {
         title: '操作',
-        key: 'action',
-        width: 140,
+        width: 205,
         align: 'center',
-        render: (h, params) => {
-            return h('div', [
-                h('Button', {
-                    props: {
-                        type: 'primary',
-                        size: 'small'
-                    },
-                    style: {
-                        marginRight: '5px'
-                    },
-                    on: {
-                        click: () => {
-                            this.show(params.index)
-                        }
-                    }
-                }, 'View'),
-                h('Button', {
-                    props: {
-                        type: 'error',
-                        size: 'small'
-                    },
-                    on: {
-                        click: () => {
-                            this.remove(params.index)
-                        }
-                    }
-                }, 'Delete')
-            ]);
-        }
+        handle: ['radio']
     },
     {
         type: 'expand',
-        width: 50,
         handle: ['expand']
     }
 ];

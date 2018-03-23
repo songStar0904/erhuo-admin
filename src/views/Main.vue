@@ -217,6 +217,7 @@
         created () {
             // 显示打开的页面的列表
             this.$store.commit('setOpenedList');
+            this.$store.commit('setUser', JSON.parse(localStorage.getItem('user_info')));
         }
     };
 </script>
