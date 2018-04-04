@@ -9,16 +9,16 @@
 // 导入模块
 import axios from 'axios'
 import env from '../../../build/env';
-import {router} from '@/router';
+import router from '../../router/router';
 import md5 from 'js-md5';
 import qs from 'qs';
 import {Message} from 'iview';
 const ajaxUrl = env === 'development'
-    ? 'http://api.erhuo.com'
+    ? '/api'
     : env === 'production'
         ? 'http://api.erhuo.com'
         : 'http://api.erhuo.com';
-
+// axios.defaults.withCredentials=true;//让ajax携带cookie
 export default function fetch (options) {
   return new Promise((resolve, reject) => {
     // 创建一个axios实例
@@ -76,7 +76,7 @@ export default function fetch (options) {
       // console.log(error.response.data);
       // console.log(error.response.status);
       // console.log(error.response.headers);
-      router.replace({name: `error-${error.response.status}`})
+      Message.error('Error', error.message);
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
