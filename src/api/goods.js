@@ -37,3 +37,11 @@ export function pass_goods (data) {
     data
   })
 }
+// 推广商品
+export function spread_goods (data) {
+  return fetch({
+    url: 'admin/spread_goods',
+    method: 'post',
+    data
+  })
+}

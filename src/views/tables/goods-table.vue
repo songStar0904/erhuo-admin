@@ -50,13 +50,13 @@ const switchButton = function (vm, h, data, index) {
     return h('div', [
         h('i-switch', {
             props: {
-                value: data[index].goods_status,
+                value: data[index].goods_spread,
                 'true-value': 1,
                 'false-value': 0
             },
             on: {
                 'on-change': (value) => {
-                    vm.passGoods(data[index].goods_id, value, index);
+                    vm.spreadGoods(data[index].goods_id, value, index);
                 }
             }
         }),
@@ -175,6 +175,19 @@ export default {
                 // 下架
                 this.okNoSell();
             }
+        },
+        spreadGoods (gid, spread, index) {
+            this.$fetch.goods.spread_goods({
+                goods_id: gid,
+                goods_spread: spread
+            }).then(res => {
+                if (res.code === 200) {
+                    this.data[index].goods_spread = res.data;
+                    this.$Message.info(res.msg)
+                } else {
+                    this.$Message.error(res.msg);
+                }
+            })
         },
         okNoPass (msg) {
             this.sendNotice(msg, 1);

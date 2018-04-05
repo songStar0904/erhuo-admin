@@ -209,7 +209,7 @@ export const goodsColumns = [
         }
     },
     {
-        title: '审核',
+        title: '推广',
         key: 'goods_status',
         align: 'center',
         handle: ['switch']
