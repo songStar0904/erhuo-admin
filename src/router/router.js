@@ -131,6 +131,16 @@ export const appRouter = [
         ]
     },
     {
+        path: '/report',
+        icon: 'bug',
+        name: 'report',
+        title: '举报',
+        component: Main,
+        children: [
+            { path: 'report-list', title: '举报列表', name: 'report-lisg', icon: 'bug', component: () => import('@/views/tables/report-table.vue') }
+        ]
+    },
+    {
         path: '/component',
         icon: 'social-buffer',
         name: 'component',

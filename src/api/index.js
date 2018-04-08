@@ -11,13 +11,15 @@ import * as goods from './goods.js'
 import * as notice from './notice.js'
 import * as main from './main.js'
 import * as classify from './classify.js'
+import * as report from './report.js'
 
 const apiObj = {
   main,
   user,
   notice,
   goods,
-  classify
+  classify,
+  report
 }
 const install = function (Vue) {
   if (install.installed) return

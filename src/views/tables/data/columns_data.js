@@ -249,6 +249,74 @@ export const goodsColumns = [
     }
 ];
 
+export const reportColumns = [
+    {
+        title: '序号',
+        type: 'index',
+        key: 'goods_id',
+        width: 80,
+        align: 'center',
+        sortable: true
+    },
+    {
+        title: '举报人',
+        width: 150,
+        align: 'center',
+        render: (h, params) => {
+            return h('div', [
+                h('Avatar', {
+                    props: {
+                        src: params.row.user.icon,
+                        size: 'small'
+                    },
+                    style: {
+                        marginRight: '5px'
+                    }
+                }),
+                h('span', {
+                }, params.row.user.name)
+            ]);
+        }
+    },
+    {
+        title: '举报理由',
+        key: 'report_reason',
+        align: 'center',
+        sortable: true
+    },
+    {
+        title: '理由内容',
+        key: 'report_content',
+        align: 'center',
+        sortable: true
+    },
+    {
+        title: '创建时间',
+        align: 'center',
+        sortable: true,
+        width: 160,
+        render: (h, params) => {
+            return h('div', [
+                h('Icon', {
+                    props: {
+                        type: 'clock'
+                    }
+                }),
+                h('span', util.formatDate(params.row.report_time))
+            ])
+        }
+    },
+    {
+        title: '操作',
+        align: 'center',
+        handle: []
+    },
+    {
+        type: 'expand',
+        handle: ['expand']
+    }
+];
+
 export const gclassifyColumns = [
     {
         title: '序号',
@@ -273,7 +341,8 @@ export const gclassifyColumns = [
 ];
 const tableData = {
     userColumns: userColumns,
-    gclassifyColumns: gclassifyColumns
+    gclassifyColumns: gclassifyColumns,
+    reportColumns: reportColumns
 };
 
 export default tableData;
