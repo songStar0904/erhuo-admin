@@ -167,6 +167,7 @@ export default {
             this.index = index;
             if (status === 1) {
                 // 未通过
+                console.log(this.noPassModal);
                 this.noPassModal = true;
             } else if (status === 2) {
                 // 通过
@@ -209,6 +210,9 @@ export default {
                 notice_content: msg
             }).then(res => {
                 if (res.code === 200) {
+                    if (status === 1) {
+                        this.noPassModal = false;
+                    }
                     this.changeStatus(this.nowData.goods_id, status, this.index);
                 } else {
                     this.$Message.error(res.msg);
