@@ -308,8 +308,9 @@ export const reportColumns = [
     },
     {
         title: '操作',
+        width: 140,
         align: 'center',
-        handle: []
+        handle: ['ignore', 'del']
     },
     {
         type: 'expand',

@@ -30,7 +30,7 @@
                         logo
 					    </Col>
 				        <Col span="12">
-					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" :page-size-opts="[1, 2, 20, 50]" size="small" show-elevator show-sizer class-name="fr"></Page>
+					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" size="small" show-elevator show-sizer class-name="fr"></Page>
 					    </Col>
 				    </Row>
                     
@@ -117,7 +117,7 @@ export default {
             searchData: '',
             tableName: '',
             page: 1,
-            num: 5
+            num: 10
         };
     },
     methods: {

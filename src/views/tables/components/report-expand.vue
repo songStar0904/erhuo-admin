@@ -92,7 +92,7 @@
         },
         computed: {
         	item () {
-        		return this.row.item;
+        		return this.row.child;
         	}
         }
     };

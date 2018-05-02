@@ -14,9 +14,12 @@
                     </p>
                     <Row>
 				        <Col span="12">
-				        	<Input v-model="searchData" placeholder="请输入二货名称搜搜..." style="width: 200px" />
-	                        <span @click="handleSearch" style="margin: 0 10px;"><Button type="primary" icon="search">搜索</Button></span>
-	                        <Button @click="handleCancel" type="ghost" >取消</Button>
+				        	<RadioGroup v-model="type" type="button">
+						        <Radio :label="0">全部</Radio>
+						        <Radio :label="1">二货</Radio>
+						        <Radio :label="2">评论</Radio>
+						        <Radio :label="3">动态</Radio>
+						    </RadioGroup>
 				        </Col>
 				        <Col span="12">
 				        	<Button type="primary" icon="ios-loop-strong" :loading="loading" @click="getReport" class="fr">刷  新</Button>
@@ -30,10 +33,9 @@
                         logo
 					    </Col>
 				        <Col span="12">
-					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" :page-size-opts="[1, 2, 20, 50]" size="small" show-elevator show-sizer class-name="fr"></Page>
+					        <Page :total="total" @on-change="changePage" :show-total="true" :page-size="num" @on-page-size-change="changePageNum" size="small" show-elevator show-sizer class-name="fr"></Page>
 					    </Col>
 				    </Row>
-                    
                 </Card>
             </Col>
         </Row>
@@ -44,21 +46,34 @@
 import util from '@/libs/util';
 import {reportColumns} from './data/columns_data.js';
 import reportExpand from './components/report-expand.vue';
-const switchButton = function (vm, h, data, index) {
-    return h('div', [
-        h('i-switch', {
+const ignoreButton = function (vm, h, data, index) {
+    return h('i-button', {
             props: {
-                value: data[index].goods_spread,
-                'true-value': 1,
-                'false-value': 0
+                type: 'primary',
+                size: 'small'
+            },
+            style: {
+            	marginRight: '5px'
             },
             on: {
-                'on-change': (value) => {
-                    vm.spreadGoods(data[index].goods_id, value, index);
+                click: () => {
+                    vm.delReport(data[index].report_id, index);
                 }
             }
-        }),
-    ]);
+        }, '忽 略');
+}
+const delButton = function (vm, h, data, index) {
+    return h('i-button', {
+            props: {
+                type: 'error',
+                size: 'small'
+            },
+            on: {
+                click: () => {
+                    vm.openModal(data[index].report_gid, data[index].report_type);
+                }
+            }
+        }, '删 除');
 }
 const expand = function (vm, h, expandRow, data) {
     return h(expandRow, {
@@ -66,35 +81,6 @@ const expand = function (vm, h, expandRow, data) {
             row: data
         }
     })
-}
-const radio = function (vm, h, data, index) {
-    return h('radio-group', {
-                props: {
-                        value: data[index].goods_status,
-                        size: 'small'
-                    },
-                    on: {
-                        'on-change': (value) => {
-                            vm.passGoods(data[index].goods_id, value, index);
-                        }
-                    }
-            }, [
-                h('radio', {
-                    props: {
-                        label: 1
-                    }
-                }, '不通过'),
-                h('radio', {
-                    props: {
-                        label: 2
-                    }
-                }, '通过'),
-                h('radio', {
-                    props: {
-                        label: 3
-                    }
-                }, '下架'),
-            ]);
 }
 export default {
     data () {
@@ -108,11 +94,10 @@ export default {
             reportColumns: reportColumns,
             initTable: [],
             total: 0,
-            searchData: '',
+            type: 0,
             tableName: '',
             page: 1,
-            num: 5,
-            type: 0
+            num: 10
         };
     },
     methods: {
@@ -126,12 +111,12 @@ export default {
         			item.render = (h, param) => {
                         let children = [];
                         item.handle.forEach(item => {
-                            if (item === 'switch') {
-                                children.push(switchButton(this, h, this.data, param.index));
+                            if (item === 'ignore') {
+                                children.push(ignoreButton(this, h, this.data, param.index));
                             } else if (item === 'expand') {
                                 children.push(expand(this, h, reportExpand, this.data[param.index]));
-                            } else if (item === 'radio') {
-                                children.push(radio(this, h, this.data, param.index))
+                            } else if (item === 'del') {
+                                children.push(delButton(this, h, this.data, param.index))
                             }
                         });
                         return h('div', children);
@@ -145,14 +130,52 @@ export default {
         		page: this.page,
         		num: this.num,
         		type: this.type
-        	})
-        	.then(res => {
+        	}).then(res => {
         		this.loading = false;
         		if (res.code === 200) {
         			this.data = res.data;
         			this.total = res.total;
         		} else {
         			this.data = [];
+        			this.$Message.error(res.msg);
+        		}
+        	})
+        },
+        delReport (rid, index) {
+        	this.loading = true;
+        	this.$fetch.report.del({
+        		report_id: rid
+        	}).then(res => {
+        		this.loading = false;
+        		if (res.code === 200) {
+        			this.getReport();
+        			this.$Message.success(res.msg);
+        		} else {
+        			this.$Message.error(res.msg);
+        		}
+        	})
+        },
+        openModal (gid, type) {
+        	this.$Modal.confirm({
+                title: '注意',
+                content: '您确定删除这个被举报的内容吗？',
+                cancelText: '我手滑了',
+                onOk: () => {
+                    this.delItem(gid, type);
+                },
+            });
+        },
+        delItem (gid, type) {
+        	this.loading = true;
+        	this.$fetch.report.delItem({
+        		gid,
+        		type
+        	}).then(res => {
+        		this.loading = false;
+        		if (res.code === 200) {
+        			this.getReport();
+        			this.$Message.success(res.msg);
+        		} else {
         			this.$Message.error(res.msg);
         		}
         	})
@@ -179,6 +202,9 @@ export default {
     		this.getReport();
     	},
     	num () {
+    		this.getReport();
+    	},
+    	type () {
     		this.getReport();
     	}
     }
