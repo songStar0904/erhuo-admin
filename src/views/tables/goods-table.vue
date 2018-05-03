@@ -14,16 +14,25 @@
                     </p>
                     <Row>
 				        <Col span="12">
+                            <Select v-model="cid" style="width:100px">
+                                <Option :value="0" :key="0">全部</Option>
+                                <Option v-for="item in classify" :value="item.gclassify_id" :key="item.gclassify_id">{{ item.gclassify_name }}</Option>
+                            </Select>
 				        	<Input v-model="searchData" placeholder="请输入二货名称搜搜..." style="width: 200px" />
 	                        <span @click="handleSearch" style="margin: 0 10px;"><Button type="primary" icon="search">搜索</Button></span>
 	                        <Button @click="handleCancel" type="ghost" >取消</Button>
 				        </Col>
 				        <Col span="12">
+                        <!-- <CheckboxGroup v-model="social">
+                            <Checkbox label="twitter">
+                                <span>Twitter</span>
+                            </Checkbox>
+                        </CheckboxGroup> -->
 				        	<Button type="primary" icon="ios-loop-strong" :loading="loading" @click="getGoods" class="fr">刷  新</Button>
 				        </Col>
 				    </Row>
                     <Row style="margin: 40px 0;">
-                        <Table :loading="loading" :columns="goodsColumns" :data="data" ref="tableExcel"></Table>
+                        <Table :loading="loading" :row-class-name="rowClassName" :columns="goodsColumns" :data="data" ref="tableExcel"></Table>
                     </Row>
                     <Row span="24">
 				        <Col span="12">
@@ -104,7 +113,7 @@ export default {
     },
     data () {
         return {
-        	title: '商品列表',
+        	title: '二货列表',
             notice_title: ['未审核', '商品审核未通过通知', '商品审核通过通知', '商品已下架通知'],
         	loading: false,
             data: [],
@@ -117,12 +126,15 @@ export default {
             searchData: '',
             tableName: '',
             page: 1,
-            num: 10
+            num: 10,
+            cid: 0,
+            classify: []
         };
     },
     methods: {
         init () {
         	this.getColumns();
+            this.getClassify();
             this.getGoods();
         },
         getColumns () {
@@ -144,12 +156,24 @@ export default {
         		}
         	});
         },
+        getClassify () {
+            this.$fetch.classify.get({
+                type: 'gclassify'
+            }).then(res => {
+                if (res.code === 200) {
+                    this.classify = res.data;
+                } else {
+                    this.$Message.error(res.msg);
+                }
+            })
+        },
         getGoods () {
             this.loading = true;
         	this.$fetch.goods.get({
         		page: this.page,
         		num: this.num,
-        		search: this.searchData
+        		search: this.searchData,
+                cid: this.cid
         	})
         	.then(res => {
         		if (res.code === 200) {
@@ -243,10 +267,17 @@ export default {
         },
         handleSearch () {
             this.initTable = this.data;
-            this.getgoods();
+            this.getGoods();
         },
         handleCancel () {
             this.data = this.initTable;
+        },
+        rowClassName (row, index) {
+            if (row.goods_status === 0) {
+                return 'demo-table-warning-row';
+            } else if (row.goods_status === 1) {
+                return 'demo-table-disabled-row';
+            }
         }
     },
     created () {

@@ -101,22 +101,22 @@ export const appRouter = [
         path: '/user',
         icon: 'android-people',
         name: 'user',
-        title: '用户',
+        title: '用户管理',
         component: Main,
         children: [
             { path: 'user-list', title: '用户列表', name: 'user_list', icon: 'android-people', component: () => import('@/views/tables/user-table.vue') },
-            { path: 'user-lis', title: '用户列表', name: 'use', icon: 'android-people', component: () => import('@/views/tables/searchable-table.vue') }
+            { path: 'user-lis', title: '小黑屋', name: 'use', icon: 'android-people', component: () => import('@/views/tables/searchable-table.vue') }
         ]
     },
     {
         path: '/goods',
         icon: 'android-playstore',
         name: 'goods',
-        title: '商品',
+        title: '二货管理',
         component: Main,
         children: [
-            { path: 'goods-list', title: '商品列表', name: 'goods_list', icon: 'android-playstore', component: () => import('@/views/tables/goods-table.vue') },
-            { path: 'goods-classify', title: '商品分类', name: 'goods_classify', icon: 'merge', component: () => import('@/views/tables/goods-classify.vue') }
+            { path: 'goods-list', title: '二货列表', name: 'goods_list', icon: 'android-playstore', component: () => import('@/views/tables/goods-table.vue') },
+            { path: 'goods-classify', title: '二货分类', name: 'goods_classify', icon: 'merge', component: () => import('@/views/tables/goods-classify.vue') }
         ]
     },
     {

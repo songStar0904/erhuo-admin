@@ -22,3 +22,11 @@ export function edit_fmsg (data) {
     data
   })
 }
+// 解锁
+export function on_clock (data) {
+  return fetch({
+    url: 'admin/on_lock',
+    method: 'post',
+    data
+  })
+}

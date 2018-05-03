@@ -62,7 +62,9 @@
         <div class="single-page-con" :style="{left: shrink?'60px':'200px'}">
             <div class="single-page">
                 <keep-alive :include="cachePage">
-                    <router-view></router-view>
+                    <transition name="slide-fade">
+                        <router-view></router-view>
+                    </transition>
                 </keep-alive>
             </div>
         </div>
